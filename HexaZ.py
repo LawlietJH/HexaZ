@@ -2,6 +2,7 @@
 import sys, os
 import threading
 from datetime import datetime
+from time import time
 
 pause = lambda: os.system('Pause > NUL')
 
@@ -69,13 +70,13 @@ def pyramidData(s, c):
 		cont += 1
 		fil.write(l+'\n')
 		if not len(l) == longy:
-			piramidData(s, l)
+			pyramidData(s, l)
 	
 	sec_n = int(datetime.now().strftime('%S'))
 	
 	if sec_n > sec or (sec_n == 0 and not sec == 0):
 		sec = sec_n
-		sys.stdout.write('\r Total: {:.2f}%    '.format(getPorcent()))
+		sys.stdout.write('\r Total: {:.2f}%    \t {} segs   '.format(getPorcent(), int(time()-tiempo_inicial)))
 	
 
 def exactData(s, c):
@@ -93,13 +94,13 @@ def exactData(s, c):
 	
 	if sec_n > sec or (sec_n == 0 and not sec == 0):
 		sec = sec_n
-		sys.stdout.write('\r Total: {:.2f}%    '.format(getPorcent()))
+		sys.stdout.write('\r Total: {:.2f}%    \t {} segs   '.format(getPorcent(), int(time()-tiempo_inicial)))
 
 
 
 if __name__ == '__main__':
 	
-	ver = 'v1.0.2'
+	ver = 'v1.0.3'
 	sec = 0
 	string = '0123456789ABCDEF'
 	_type = 'exact'		# ['pyramid', 'exact']
@@ -110,6 +111,10 @@ if __name__ == '__main__':
 	espacio, tipo = getSizeFile(total_bytes)
 	
 	print('\n\n Generador de Diccionario Hexadecimal. {}'.format(ver))
+	print('\n Longitud: {}'.format(longy))
+	print('\n Tipo: {} ({})'.format(_type, 'De Longitud Exacta Deseada' 
+											if _type == 'exact' else 
+											'De Longitud 1 a Cantidad Deseada'))
 	print('\n Total Estimado de Cadenas: {}'.format(normalizeNumber(estimate)))
 	if tipo == 'Bytes':
 		print('\n Peso Exacto de Salida: ''{} {} ({} bytes)\n\n\n'.format(
@@ -119,11 +124,15 @@ if __name__ == '__main__':
 									espacio, tipo, normalizeNumber(total_bytes)))
 	
 	fil = open('hexaz - len_{}-{}.zion'.format(longy, _type.title()),'w')
+	tiempo_inicial = time()
 	if _type == 'pyramid': pyramidData(string, '')
 	elif _type == 'exact': exactData(string, '')
+	tiempo_final = time() 
+	tiempo_ejecucion = tiempo_final - tiempo_inicial
 	fil.close()
-	sys.stdout.write('\r Porcentaje Total: {:.2f}%    '.format(getPorcent()))
-	print('\n\n Total de Cadenas Generado: {}    '.format(normalizeNumber(cont)))
+	sys.stdout.write('\r Porcentaje Total: {:.2f}%        '.format(getPorcent()))
+	print('\n\n Total de Cadenas Generadas: {}    '.format(normalizeNumber(cont)))
+	print('\n\n Tiempo transcurrido: {} segundos'.format(int(tiempo_ejecucion)))
 
 	
 
