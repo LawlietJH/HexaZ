@@ -1,10 +1,13 @@
 
-import sys, os
-import threading
+# HexaZ.py
+# Version: v1.0.4
+# Python 3
+
 from datetime import datetime
 from time import time
+import sys, os
 
-pause = lambda: os.system('Pause > NUL')
+pause = lambda: os.system('pause > nul')
 
 def estimateTotal(l_str, lenght):
 	val = 0
@@ -31,7 +34,7 @@ def getSizeFile(total_bytes):
 	total = total_bytes
 	_type = 'Bytes'
 	if total_bytes >= (1024**4):
-		total = total_bytes / (1024**3)
+		total = total_bytes / (1024**4)
 		_type = 'Tb'
 	elif total_bytes >= (1024**3):
 		total = total_bytes / (1024**3)
@@ -42,7 +45,6 @@ def getSizeFile(total_bytes):
 	elif total_bytes >=1024:
 		total = total_bytes / 1024
 		_type = 'Kb'
-	
 	return total, _type
 
 def normalizeNumber(number):
@@ -52,7 +54,7 @@ def normalizeNumber(number):
 	for n in total:
 		val += n
 		if cont % 3 == 0 and not cont == len(total):
-			val += '.'
+			val += ','
 		cont += 1
 	return val[::-1]
 	
@@ -60,54 +62,58 @@ def getPorcent():
 	porcent = (cont / estimate) * 100
 	return porcent
 
+def write(cad):
+	global cont
+	cont += 1
+	fil.write(cad+'\n')
 
-
-def pyramidData(s, c):
-	global cont, sec
-	
-	for l in s:
-		l = c+l
-		cont += 1
-		fil.write(l+'\n')
-		if not len(l) == longy:
-			pyramidData(s, l)
-	
+def showPorcent():
+	global sec
 	sec_n = int(datetime.now().strftime('%S'))
-	
 	if sec_n > sec or (sec_n == 0 and not sec == 0):
 		sec = sec_n
-		sys.stdout.write('\r Total: {:.2f}%    \t {} segs   '.format(getPorcent(), int(time()-tiempo_inicial)))
+		sys.stdout.write('\r Total: {:.2f}%    \t {} segs   '.format(
+							getPorcent(), int(time()-tiempo_inicial)))
+
+
+
+def pyramidData(string, prefijo):
+	for c in string:
+		cadena = prefijo+c
+		write(cadena)
+		if not len(cadena) == longy:
+			pyramidData(string, cadena)
+	showPorcent()
 	
 
-def exactData(s, c):
-	global cont, sec
-	
-	for l in s:
-		l = c+l
-		if len(l) == longy:
-			cont += 1
-			fil.write(l+'\n')
+def exactData(string, prefijo):
+	for c in string:
+		cadena = prefijo+c
+		if len(cadena) == longy:
+			write(cadena)
 		else:
-			exactData(s, l)
-	
-	sec_n = int(datetime.now().strftime('%S'))
-	
-	if sec_n > sec or (sec_n == 0 and not sec == 0):
-		sec = sec_n
-		sys.stdout.write('\r Total: {:.2f}%    \t {} segs   '.format(getPorcent(), int(time()-tiempo_inicial)))
+			exactData(string, cadena)
+	showPorcent()
+
+
+
+__version__ = 'v1.0.4'
+__author__ = 'LawlietJH'
 
 
 
 if __name__ == '__main__':
 	
-	ver = 'v1.0.3'
-	sec = 0
-	string = '0123456789ABCDEF'
+	ver = 'v1.0.4'
 	_type = 'exact'		# ['pyramid', 'exact']
-	longy = 8			# Modificar por la cantidad que se desee.
+	longy = 5			# Modificar por la cantidad que se desee. 1 a 8
+	
+	STRING = '0123456789ABCDEF'
+	sec = 0
 	cont = 0
-	estimate = estimateTotal(len(string), longy)
-	total_bytes = estimateBytesTotal(estimate, len(string), longy)
+	
+	estimate = estimateTotal(len(STRING), longy)
+	total_bytes = estimateBytesTotal(estimate, len(STRING), longy)
 	espacio, tipo = getSizeFile(total_bytes)
 	
 	print('\n\n Generador de Diccionario Hexadecimal. {}'.format(ver))
@@ -124,12 +130,17 @@ if __name__ == '__main__':
 									espacio, tipo, normalizeNumber(total_bytes)))
 	
 	fil = open('hexaz - len_{}-{}.zion'.format(longy, _type.title()),'w')
+	
 	tiempo_inicial = time()
-	if _type == 'pyramid': pyramidData(string, '')
-	elif _type == 'exact': exactData(string, '')
+	
+	if _type == 'pyramid': pyramidData(STRING, '')
+	elif _type == 'exact': exactData(STRING, '')
+	
 	tiempo_final = time() 
 	tiempo_ejecucion = tiempo_final - tiempo_inicial
+	
 	fil.close()
+	
 	sys.stdout.write('\r Porcentaje Total: {:.2f}%        '.format(getPorcent()))
 	print('\n\n Total de Cadenas Generadas: {}    '.format(normalizeNumber(cont)))
 	print('\n\n Tiempo transcurrido: {} segundos'.format(int(tiempo_ejecucion)))
